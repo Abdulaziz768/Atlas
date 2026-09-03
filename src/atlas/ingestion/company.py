@@ -10,14 +10,7 @@ class CompanyService:
 
     def get_company(self, ticker: str) -> Company:
 
-        data = self.client.get(
-            "",
-            params={
-                "function" : "OVERVIEW",
-                "symbol" : ticker,
-                "apikey" : FINANCIAL_API_KEY,
-            },
-        )
+        data = self.get_company_data(ticker)
 
         return Company(
             ticker=data["Symbol"],
@@ -28,4 +21,15 @@ class CompanyService:
             currency=data["Currency"],
             market_cap=data.get("MarketCapitalization"),
             description=data.get("Description")
+        )
+
+    def get_company_data(self, ticker: str) -> dict:
+
+        return self.client.get(
+            "",
+            params={
+                "function" : "OVERVIEW",
+                "symbol" : ticker,
+                "apikey" : FINANCIAL_API_KEY,
+            },
         )
