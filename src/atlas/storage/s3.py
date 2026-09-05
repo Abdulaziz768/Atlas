@@ -16,3 +16,13 @@ class S3Storage:
             Body = json.dumps(data, indent=2),
             ContentType = "application/json",
         )
+
+    def read_json(self, key: str) -> dict:
+        response = self.client.get_object(
+            Bucket=self.bucket_name,
+            Key=key,
+        )
+
+        content = response['Body'].read().decode("utf-8")
+
+        return json.loads(content)
