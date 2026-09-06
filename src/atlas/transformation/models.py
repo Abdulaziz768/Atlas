@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import date
 
 @dataclass
 class CompanyRecord:
@@ -19,3 +20,13 @@ class CompanyRecord:
     return_on_equity: float | None
 
     beta: float | None    
+
+@dataclass
+class StockPriceRecord:
+    ticker: str
+    date: date
+    open : float
+    high: float
+    low: float
+    close: float
+    volume: int | None

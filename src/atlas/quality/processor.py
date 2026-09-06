@@ -1,21 +1,22 @@
-from atlas.quality.company import CompanyQualityChecker
 from atlas.quality.models import QuarantineRecord
+
 
 class QualityProcessor:
 
-    def __init__(self, checker: CompanyQualityChecker):
+    def __init__(self, checker):
         self.checker = checker
 
-    def process(self, company):
-        result = self.checker.check(company)
+    def process(self, record):
+
+        result = self.checker.check(record)
 
         if result.valid:
-            return company, None
+            return record, None
 
         quarantine_record = QuarantineRecord(
-            ticker=company.ticker,
+            ticker=record.ticker,
             errors=result.errors,
-            record=company,
+            record=record,
         )
 
         return None, quarantine_record
