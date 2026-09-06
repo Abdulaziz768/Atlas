@@ -1,4 +1,4 @@
-from atlas.quality.company import QualityResult
+from atlas.quality.models import QualityResult
 
 
 class StockPriceQualityChecker:

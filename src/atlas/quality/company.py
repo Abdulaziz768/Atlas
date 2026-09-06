@@ -1,14 +1,9 @@
-from dataclasses import dataclass, field
 import math
 
-@dataclass
-class QualityResult:
-    valid: bool
-    errors: list[str] = field(default_factory=list)
+from atlas.quality.models import QualityResult
 
 
 class CompanyQualityChecker:
-
     def check(self, company):
         errors = []
 
@@ -36,12 +31,18 @@ class CompanyQualityChecker:
         if company.beta is not None and not math.isfinite(company.beta):
             errors.append("beta must be a finite number")
 
-        if (company.profit_margin is not None and not -1 <= company.profit_margin <= 1):
+        if (
+            company.profit_margin is not None
+            and not -1 <= company.profit_margin <= 1
+        ):
             errors.append("profit margin must be between -1 and 1")
 
-        if (company.operating_margin is not None and not -1 <= company.operating_margin <= 1):
+        if (
+            company.operating_margin is not None
+            and not -1 <= company.operating_margin <= 1
+        ):
             errors.append("operating margin must be between -1 and 1")
-            
+
         return QualityResult(
             valid=len(errors) == 0,
             errors=errors,

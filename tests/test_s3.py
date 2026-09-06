@@ -1,6 +1,8 @@
-from atlas.storage.s3 import S3Storage
-import json
 import io
+import json
+
+from atlas.storage.s3 import S3Storage
+
 
 class FakeS3Client:
 
@@ -21,10 +23,15 @@ class FakeS3Client:
         }
 
 
-def test_upload_csv():
+def create_storage():
     client = FakeS3Client()
     storage = S3Storage("atlas-bucket")
     storage.client = client
+    return storage, client
+
+
+def test_upload_csv():
+    storage, client = create_storage()
 
     data = [
         {
@@ -41,12 +48,11 @@ def test_upload_csv():
         },
     ]
 
-    storage.upload_csv(
-        data=data,
-        key="raw/stock_price/2026-09-05/AAPL.csv",
-    )
+    key = "raw/stock_price/2026-09-05/AAPL.csv"
 
-    uploaded = client.objects["raw/stock_price/2026-09-05/AAPL.csv"]
+    storage.upload_csv(data=data, key=key)
+
+    uploaded = client.objects[key]
 
     assert uploaded["ContentType"] == "text/csv"
     assert uploaded["Body"] == (
@@ -57,11 +63,11 @@ def test_upload_csv():
 
 
 def test_read_csv():
-    client = FakeS3Client()
-    storage = S3Storage("atlas-bucket")
-    storage.client = client
+    storage, client = create_storage()
 
-    client.objects["raw/stock_price/AAPL.csv"] = {
+    key = "raw/stock_price/AAPL.csv"
+
+    client.objects[key] = {
         "Body": (
             "ticker,date,open,close\r\n"
             "AAPL,2026-09-05,240.50,243.10\r\n"
@@ -70,7 +76,7 @@ def test_read_csv():
         "ContentType": "text/csv",
     }
 
-    records = storage.read_csv("raw/stock_price/AAPL.csv")
+    records = storage.read_csv(key)
 
     assert records == [
         {
@@ -87,10 +93,9 @@ def test_read_csv():
         },
     ]
 
+
 def test_upload_json():
-    client = FakeS3Client()
-    storage = S3Storage("atlas-bucket")
-    storage.client = client
+    storage, client = create_storage()
 
     data = {
         "ticker": "AAPL",
@@ -98,20 +103,18 @@ def test_upload_json():
         "message": "Atlas s3 test",
     }
 
-    storage.upload_json(
-        data=data,
-        key="raw/test/AAPL.json",
-    )
+    key = "raw/test/AAPL.json"
 
-    uploaded = client.objects["raw/test/AAPL.json"]
+    storage.upload_json(data=data, key=key)
+
+    uploaded = client.objects[key]
 
     assert uploaded["ContentType"] == "application/json"
     assert json.loads(uploaded["Body"]) == data
-    
+
+
 def test_read_json():
-    client = FakeS3Client()
-    storage = S3Storage("atlas-bucket")
-    storage.client = client
+    storage, client = create_storage()
 
     data = {
         "ticker": "AAPL",
@@ -119,11 +122,13 @@ def test_read_json():
         "message": "Atlas s3 test",
     }
 
-    client.objects["raw/test/AAPL.json"] = {
+    key = "raw/test/AAPL.json"
+
+    client.objects[key] = {
         "Body": json.dumps(data),
         "ContentType": "application/json",
     }
 
-    result = storage.read_json("raw/test/AAPL.json")
+    result = storage.read_json(key)
 
     assert result == data
