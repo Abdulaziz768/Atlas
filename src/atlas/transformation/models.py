@@ -25,8 +25,34 @@ class CompanyRecord:
 class StockPriceRecord:
     ticker: str
     date: date
-    open : float
+    open: float
     high: float
     low: float
     close: float
     volume: int | None
+
+@dataclass
+class FinancialStatementRecord:
+    ticker: str
+    fiscal_date: date
+    report_type: str
+    currency: str
+
+    revenue: int | None
+    gross_profit: int | None
+    operating_income: int | None
+    net_income: int | None
+    ebitda: int | None
+
+    total_assets: int | None
+    total_liabilities: int | None
+    total_equity: int | None
+    cash: int | None
+    inventory: int | None
+    total_debt: int | None
+
+    operating_cash_flow: int | None
+    capital_expenditure: int | None
+    investing_cash_flow: int | None
+    financing_cash_flow: int | None
+    free_cash_flow: int | None

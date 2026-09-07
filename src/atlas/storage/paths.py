@@ -48,3 +48,24 @@ class S3PathBuilder:
             f"{self.processing_date:%Y-%m-%d}/"
             f"{ticker}.json"
         )
+
+    def financial_statements_raw(self, ticker: str) -> str:
+        return (
+            f"raw/financial_statements/"
+            f"{self.processing_date:%Y-%m-%d}/"
+            f"{ticker}.json"
+        )
+
+    def financial_statements_processed(self, ticker: str) -> str:
+        return (
+            f"processed/financial_statements/"
+            f"{self.processing_date:%Y-%m-%d}/"
+            f"{ticker}.csv"
+        )
+
+    def financial_statements_quarantine(self, ticker: str) -> str:
+        return (
+            f"quarantine/financial_statements/"
+            f"{self.processing_date:%Y-%m-%d}/"
+            f"{ticker}.json"
+        )

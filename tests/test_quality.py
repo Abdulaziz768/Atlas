@@ -2,7 +2,8 @@ import pytest
 
 from atlas.quality.company import CompanyQualityChecker
 from atlas.transformation.models import CompanyRecord
-
+from atlas.quality.financial_statements import FinancialStatementQualityChecker
+from atlas.transformation.models import FinancialStatementRecord
 
 def create_company(**overrides):
     data = {
@@ -94,3 +95,54 @@ def test_company_with_invalid_operating_margin_is_invalid():
     assert result.errors == [
         "operating margin must be between -1 and 1"
     ]
+
+def create_financial_statement(**overrides):
+    data = {
+        "ticker": "AAPL",
+        "fiscal_date": "2025-09-30",
+        "report_type": "annual",
+        "currency": "USD",
+        "revenue": 416161000000,
+        "gross_profit": 195201000000,
+        "operating_income": 133050000000,
+        "net_income": 112010000000,
+        "ebitda": 144427000000,
+        "total_assets": 359241000000,
+        "total_liabilities": 285508000000,
+        "total_equity": 73733000000,
+        "cash": 35934000000,
+        "inventory": 5718000000,
+        "total_debt": 112377000000,
+        "operating_cash_flow": 111482000000,
+        "capital_expenditure": 12715000000,
+        "investing_cash_flow": 15195000000,
+        "financing_cash_flow": -120686000000,
+        "free_cash_flow": 98767000000,
+    }
+
+    data.update(overrides)
+
+    from datetime import date
+
+    if isinstance(data["fiscal_date"], str):
+        data["fiscal_date"] = date.fromisoformat(data["fiscal_date"])
+
+    return FinancialStatementRecord(**data)
+
+
+def test_valid_financial_statement_record():
+    record = create_financial_statement()
+
+    result = FinancialStatementQualityChecker().check(record)
+
+    assert result.valid is True
+    assert result.errors == []
+
+
+def test_financial_statement_with_negative_balance_sheet_value_is_invalid():
+    record = create_financial_statement(total_assets=-100)
+
+    result = FinancialStatementQualityChecker().check(record)
+
+    assert result.valid is False
+    assert result.errors == ["total_assets cannot be negative"]
