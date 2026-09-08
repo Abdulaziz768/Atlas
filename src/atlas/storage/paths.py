@@ -69,3 +69,17 @@ class S3PathBuilder:
             f"{self.processing_date:%Y-%m-%d}/"
             f"{ticker}.json"
         )
+    
+    def fundamentals_processed(self, ticker: str) -> str:
+        return (
+            f"processed/fundamentals/"
+            f"{self.processing_date:%Y-%m-%d}/"
+            f"{ticker}.csv"
+        )
+
+    def fundamentals_quarantine(self, ticker: str) -> str:
+        return (
+            f"quarantine/fundamentals/"
+            f"{self.processing_date:%Y-%m-%d}/"
+            f"{ticker}.json"
+        )
