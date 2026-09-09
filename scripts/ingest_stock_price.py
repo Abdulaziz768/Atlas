@@ -1,4 +1,5 @@
 from atlas.config.settings import FINANCIAL_API_BASE_URL
+from atlas.config.tickers import TICKERS
 from atlas.ingestion.client import APIClient
 from atlas.ingestion.stock_price import StockPriceService
 from atlas.storage.s3 import S3Storage
@@ -13,7 +14,7 @@ BUCKET_NAME = "atlas-raw-data-6304"
 
 
 def main():
-    client = APIClient(FINANCIAL_API_BASE_URL)
+    client = APIClient(FINANCIAL_API_BASE_URL, min_request_interval=1.5)
 
     stock_price_service = StockPriceService(client)
     storage = S3Storage(BUCKET_NAME)
@@ -27,11 +28,9 @@ def main():
         storage=storage,
         paths=S3PathBuilder(),
     )
-
-    pipeline.ingest("AAPL")
-
-    print("AAPL stock price ingestion completed successfully")
-
+    for ticker in TICKERS:
+        pipeline.ingest(ticker)
+        print(f"{ticker} stock price ingestion completed successfully")
 
 if __name__ == "__main__":
     main()
