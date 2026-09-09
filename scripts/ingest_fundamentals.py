@@ -1,3 +1,4 @@
+from atlas.config.tickers import TICKERS
 from atlas.storage.s3 import S3Storage
 from atlas.storage.paths import S3PathBuilder
 from atlas.pipelines.fundamentals import FundamentalsPipeline
@@ -23,12 +24,12 @@ def main():
         storage=storage,
         paths=paths,
     )
+    for ticker in TICKERS:
+        raw_key = paths.company_raw(ticker)
 
-    raw_key = paths.company_raw("AAPL")
+        pipeline.process_from_s3(raw_key)
 
-    pipeline.process_from_s3(raw_key)
-
-    print("AAPL fundamentals processing completed successfully")
+        print(f"{ticker} fundamentals processing completed successfully")
 
 
 if __name__ == "__main__":
