@@ -21,6 +21,13 @@ class S3PathBuilder:
             f"{ticker}.json"
         )
 
+    def stock_price_clean(self, ticker: str) -> str:
+        return (
+            f"clean/stock_price/"
+            f"{self.processing_date:%Y-%m-%d}/"
+            f"{ticker}.csv"
+        )
+
     def company_quarantine(self, ticker: str) -> str:
         return (
             f"quarantine/company_overview/"
@@ -47,6 +54,24 @@ class S3PathBuilder:
             f"quarantine/stock_price/"
             f"{self.processing_date:%Y-%m-%d}/"
             f"{ticker}.json"
+        )
+    
+    def stock_price_processed_date(self) -> str:
+        return (
+            f"processed/stock_price/"
+            f"{self.processing_date:%Y-%m-%d}/"
+        )
+
+    def stock_price_clean_date(self) -> str:
+        return (
+            f"clean/stock_price/"
+            f"{self.processing_date:%Y-%m-%d}/"
+        )
+
+    def stock_price_quarantine_date(self) -> str:
+        return (
+            f"quarantine/stock_price/"
+            f"{self.processing_date:%Y-%m-%d}/"
         )
 
     def financial_statements_raw(self, ticker: str) -> str:

@@ -13,12 +13,16 @@ class S3Storage:
     def upload_json(self, data: dict, key: str) -> None:
         """Upload a JSON object to s3"""
         self.client.put_object(
-            Bucket = self.bucket_name,
-            Key = key,
-            Body = json.dumps(data, indent=2),
-            ContentType = "application/json",
+            Bucket=self.bucket_name,
+            Key=key,
+            Body=json.dumps(
+                data,
+                indent=2,
+                default=lambda value: value.isoformat(),
+            ),
+            ContentType="application/json",
         )
-
+        
     def read_json(self, key: str) -> dict:
         response = self.client.get_object(
             Bucket=self.bucket_name,

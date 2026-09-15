@@ -1,7 +1,9 @@
+from datetime import datetime, timezone
 from typing import Any
 
 from atlas.ingestion.client import APIClient
 from atlas.config.settings import FINANCIAL_API_KEY
+
 
 class StockPriceService:
     """Service responsible for fetching daily stock price data."""
@@ -19,6 +21,8 @@ class StockPriceService:
             },
         )
 
+        ingestion_time = datetime.now(timezone.utc)
+
         time_series = data["Time Series (Daily)"]
 
         records = []
@@ -28,11 +32,12 @@ class StockPriceService:
                 {
                     "symbol": ticker,
                     "date": date,
-                    "open":values["1. open"],
-                    "high":values["2. high"],
-                    "low":values["3. low"],
-                    "close":values["4. close"],
-                    "volume":values["5. volume"]
+                    "open": values["1. open"],
+                    "high": values["2. high"],
+                    "low": values["3. low"],
+                    "close": values["4. close"],
+                    "volume": values["5. volume"],
+                    "ingestion_time": ingestion_time,
                 }
             )
 

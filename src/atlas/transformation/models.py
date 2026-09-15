@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 
 @dataclass
 class CompanyRecord:
@@ -18,6 +18,7 @@ class StockPriceRecord:
     low: float
     close: float
     volume: int | None
+    ingestion_time: datetime
 
 @dataclass
 class FinancialStatementRecord:

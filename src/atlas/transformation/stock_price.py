@@ -16,4 +16,5 @@ class StockPriceTransformer:
             low=to_float(data.get("low")),
             close=to_float(data.get("close")),
             volume=to_int(data.get("volume")),
+            ingestion_time=data["ingestion_time"],
         )
