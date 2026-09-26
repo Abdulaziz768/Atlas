@@ -267,3 +267,107 @@ def test_quality_before_deduplication_keeps_valid_older_record(spark):
     assert rows[0]["ticker"] == "AAPL"
     assert rows[0]["date"] == "2026-09-11"
     assert rows[0]["close"] == 332.27
+
+def test_transform_stock_price_fingerprint(spark):
+    data = [
+        (
+            "A",
+            "2026-09-20",
+            100.123,
+            105.50,
+            99.80,
+            103.25,
+            1000,
+        ),
+        (
+            "B",
+            "2026-09-20",
+            100.124,
+            105.50,
+            99.80,
+            103.25,
+            1000,
+        ),
+        (
+            "C",
+            "2026-09-20",
+            100.130,
+            105.50,
+            99.80,
+            103.25,
+            1000,
+        ),
+    ]
+
+    df = spark.createDataFrame(
+        data,
+        test_schema,
+    )
+
+    transformed = transform_stock_price(df)
+
+    rows = transformed.select(
+        "ticker",
+        "fingerprint",
+    ).collect()
+
+    fingerprints = {
+        row["ticker"]: row["fingerprint"]
+        for row in rows
+    }
+
+    assert fingerprints["A"] == fingerprints["B"]
+    assert fingerprints["A"] != fingerprints["C"]
+
+def test_fingerprint_survives_quality_and_deduplication(spark):
+    data = [
+        (
+            "AAPL",
+            "2026-09-20",
+            100.123,
+            105.50,
+            99.80,
+            103.25,
+            1000,
+            datetime(2026, 9, 20, 10, 0, tzinfo=timezone.utc),
+        ),
+        (
+            "AAPL",
+            "2026-09-20",
+            100.13,
+            105.50,
+            99.80,
+            103.25,
+            1000,
+            datetime(2026, 9, 20, 11, 0, tzinfo=timezone.utc),
+        ),
+        (
+            "AAPL",
+            "2026-09-20",
+            100.13,
+            105.50,
+            99.80,
+            103.25,
+            1000,
+            datetime(2026, 9, 20, 12, 0, tzinfo=timezone.utc),
+        ),
+    ]
+
+    df = spark.createDataFrame(data, test_schema_with_ingestion_time)
+
+    transformed = transform_stock_price(df)
+
+    valid, invalid = split_stock_price_quality(transformed)
+
+    clean = deduplicate_stock_price(valid).drop("price_status")
+
+    assert valid.count() == 3
+    assert invalid.count() == 0
+    assert clean.count() == 1
+
+    row = clean.collect()[0]
+
+    assert row["ticker"] == "AAPL"
+    assert row["date"] == "2026-09-20"
+    assert row["ingestion_time"] == datetime(2026, 9, 20, 17, 30)
+    assert row["fingerprint"] is not None

@@ -4,10 +4,9 @@ import pytest
 
 from atlas.spark.session import create_spark_session
 from atlas.spark.writer import (
-    write_stock_price_processed,
+    write_stock_price_clean,
     write_stock_price_quarantine,
 )
-
 
 @pytest.fixture(scope="module")
 def spark():
@@ -16,7 +15,7 @@ def spark():
     spark.stop()
 
 
-def test_write_stock_price_processed(spark, tmp_path):
+def test_write_stock_price_clean(spark, tmp_path):
     data = [
         (
             "AAPL",
@@ -45,7 +44,7 @@ def test_write_stock_price_processed(spark, tmp_path):
 
     output_path = str(tmp_path / "processed")
 
-    write_stock_price_processed(
+    write_stock_price_clean(
         df,
         output_path,
     )

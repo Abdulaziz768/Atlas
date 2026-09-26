@@ -18,7 +18,7 @@ stock_price_schema = StructType([
     StructField("low", DoubleType(), False),
     StructField("close", DoubleType(), False),
     StructField("volume", LongType(), True),
-    StructField("ingestion_time", TimestampType(), False),
+    StructField("ingestion_time", TimestampType(), True),
 ])
 
 
@@ -31,5 +31,6 @@ def read_stock_price(
         spark.read
         .schema(stock_price_schema)
         .option("header", True)
+        .option("recursiveFileLookup", True)
         .csv(path)
     )

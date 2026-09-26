@@ -1,11 +1,11 @@
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import col, row_number, when
+from pyspark.sql.functions import col, row_number, when, concat_ws, round, sha2
 from pyspark.sql.window import Window
 
 
 def transform_stock_price(df: DataFrame) -> DataFrame:
 
-    return df.withColumn(
+    price_status =  df.withColumn(
         "price_status",
         when(col("ticker").isNull(), "invalid")
         .when(col("date").isNull(), "invalid")
@@ -25,6 +25,21 @@ def transform_stock_price(df: DataFrame) -> DataFrame:
         .otherwise("valid"),
     )
 
+    fingerprint = price_status.withColumn(
+        "fingerprint",
+        sha2(
+            concat_ws(
+                "|",
+                round(col("open"), 2),
+                round(col("high"), 2),
+                round(col("low"), 2),
+                round(col("close"), 2),
+            ),
+            256,
+        ),
+    )
+
+    return fingerprint
 
 def split_stock_price_quality(
     df: DataFrame,

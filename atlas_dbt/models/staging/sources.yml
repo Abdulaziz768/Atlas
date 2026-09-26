@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: atlas_staging
+    database: ATLAS_DB
+    schema: STAGING
+    tables:
+      - name: STOCK_PRICE

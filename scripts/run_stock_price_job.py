@@ -14,7 +14,7 @@ try:
         spark=spark,
         input_path=(
             f"s3a://{BUCKET_NAME}/"
-            f"{paths.stock_price_processed_date()}"
+            "processed/stock_price/"
         ),
         clean_output_path=(
             f"s3a://{BUCKET_NAME}/"
