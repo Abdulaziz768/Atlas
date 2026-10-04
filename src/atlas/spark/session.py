@@ -11,7 +11,7 @@ def create_spark_session() -> SparkSession:
         )
         .config(
             "spark.hadoop.fs.s3a.aws.credentials.provider",
-            "org.apache.hadoop.fs.s3a.auth.ProfileAWSCredentialsProvider",
+            "software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider",
         )
         .getOrCreate()
     )

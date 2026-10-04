@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_stock_price
+    columns:
+      - name: ticker
+        data_tests:
+          - not_null
+          
+      - name: date
+        data_tests:
+          - not_null
