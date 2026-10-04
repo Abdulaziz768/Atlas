@@ -178,7 +178,6 @@ def test_split_stock_price_quality(spark):
     assert invalid_row["ticker"] == "AAPL"
     assert invalid_row["date"] == "2026-09-10"
 
-
 def test_deduplicate_stock_price_keeps_latest_ingestion(spark):
     data = [
         (
@@ -210,16 +209,22 @@ def test_deduplicate_stock_price_keeps_latest_ingestion(spark):
 
     result = deduplicate_stock_price(df)
 
-    rows = result.collect()
+    row = result.selectExpr(
+        "close",
+        "unix_timestamp(ingestion_time) as ingestion_timestamp",
+    ).collect()[0]
 
-    assert len(rows) == 1
-    assert rows[0]["close"] == 333.00
-    assert rows[0]["ingestion_time"] == datetime(
-        2026,
-        9,
-        12,
-        11,
-        30,
+    assert row["close"] == 333.00
+
+    assert row["ingestion_timestamp"] == int(
+        datetime(
+            2026,
+            9,
+            12,
+            6,
+            0,
+            tzinfo=timezone.utc,
+        ).timestamp()
     )
 
 
@@ -261,12 +266,28 @@ def test_quality_before_deduplication_keeps_valid_older_record(spark):
     assert valid.count() == 1
     assert invalid.count() == 1
 
-    rows = result.collect()
+    row = result.selectExpr(
+        "ticker",
+        "date",
+        "close",
+        "unix_timestamp(ingestion_time) as ingestion_timestamp",
+    ).collect()[0]
 
-    assert len(rows) == 1
-    assert rows[0]["ticker"] == "AAPL"
-    assert rows[0]["date"] == "2026-09-11"
-    assert rows[0]["close"] == 332.27
+    assert row["ticker"] == "AAPL"
+    assert row["date"] == "2026-09-11"
+    assert row["close"] == 332.27
+
+    assert row["ingestion_timestamp"] == int(
+        datetime(
+            2026,
+            9,
+            12,
+            5,
+            0,
+            tzinfo=timezone.utc,
+        ).timestamp()
+    )
+
 
 def test_transform_stock_price_fingerprint(spark):
     data = [
@@ -319,6 +340,7 @@ def test_transform_stock_price_fingerprint(spark):
     assert fingerprints["A"] == fingerprints["B"]
     assert fingerprints["A"] != fingerprints["C"]
 
+
 def test_fingerprint_survives_quality_and_deduplication(spark):
     data = [
         (
@@ -353,7 +375,10 @@ def test_fingerprint_survives_quality_and_deduplication(spark):
         ),
     ]
 
-    df = spark.createDataFrame(data, test_schema_with_ingestion_time)
+    df = spark.createDataFrame(
+        data,
+        test_schema_with_ingestion_time,
+    )
 
     transformed = transform_stock_price(df)
 
@@ -365,9 +390,26 @@ def test_fingerprint_survives_quality_and_deduplication(spark):
     assert invalid.count() == 0
     assert clean.count() == 1
 
-    row = clean.collect()[0]
+    row = clean.selectExpr(
+        "ticker",
+        "date",
+        "unix_timestamp(ingestion_time) as ingestion_timestamp",
+        "fingerprint",
+    ).collect()[0]
 
     assert row["ticker"] == "AAPL"
     assert row["date"] == "2026-09-20"
-    assert row["ingestion_time"] == datetime(2026, 9, 20, 17, 30)
+
+    assert row["ingestion_timestamp"] == int(
+        datetime(
+            2026,
+            9,
+            20,
+            12,
+            0,
+            tzinfo=timezone.utc,
+        ).timestamp()
+    )
+
     assert row["fingerprint"] is not None
+

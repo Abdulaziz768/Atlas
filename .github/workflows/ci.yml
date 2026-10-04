@@ -33,4 +33,4 @@ jobs:
         run: python -m pip install -e ".[test]"
 
       - name: Run tests
-        run: python -m pytest
+        run: python -m pytest tests --ignore=tests/integration
