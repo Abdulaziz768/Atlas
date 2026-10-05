@@ -9,6 +9,7 @@ description = "Atlas"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "pyspark==4.2.0",
+    "httpx2",
     "boto3==1.43.86",
     "requests",
     "python-dotenv==1.2.3",
