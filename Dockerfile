@@ -18,6 +18,6 @@ RUN pip install --no-cache-dir -r /requirements.txt
 
 WORKDIR /opt/atlas
 
-COPY . /opt/atlas
+COPY --chown=airflow:root . /opt/atlas
 
 ENV PYTHONPATH=/opt/atlas/src

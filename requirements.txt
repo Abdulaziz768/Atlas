@@ -1,3 +1,5 @@
 apache-airflow-providers-snowflake==6.17.0
 pyspark==4.2.0
 boto3==1.43.86
+dbt-core==1.12.4
+dbt-snowflake==1.12.0
