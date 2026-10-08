@@ -10,3 +10,25 @@ models:
       - name: date
         data_tests:
           - not_null
+  - name: stock_performance
+    columns:
+      - name: ticker
+        data_tests:
+          - not_null
+          - unique
+
+      - name: first_date
+        data_tests:
+          - not_null
+
+      - name: latest_date
+        data_tests:
+          - not_null
+
+      - name: latest_close
+        data_tests:
+          - not_null
+
+      - name: trading_days
+        data_tests:
+          - not_null

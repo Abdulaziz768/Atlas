@@ -7,5 +7,7 @@ select
     close,
     volume,
     ingestion_time,
-    fingerprint
-from {{ source('atlas_staging', 'STOCK_PRICE') }}
+    fingerprint,
+    daily_change,
+    daily_return_pct
+from {{ source('atlas_core', 'STOCK_PRICE') }}
