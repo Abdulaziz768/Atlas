@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from atlas.api.snowflake import (
     get_stock_performance,
@@ -10,6 +11,14 @@ app = FastAPI(
     title="Atlas API",
     description="Financial analytics API powered by Snowflake",
     version="0.1.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

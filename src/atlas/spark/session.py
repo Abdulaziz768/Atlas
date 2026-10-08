@@ -7,11 +7,15 @@ def create_spark_session() -> SparkSession:
         .appName("Atlas")
         .config(
             "spark.jars.packages",
-            "org.apache.hadoop:hadoop-aws:3.5.0",
+            "org.apache.spark:spark-hadoop-cloud_2.13:4.2.0",
         )
         .config(
             "spark.hadoop.fs.s3a.aws.credentials.provider",
-            "software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider",
+            "org.apache.hadoop.fs.s3a.auth.ProfileAWSCredentialsProvider",
+        )
+        .config(
+            "spark.hadoop.fs.s3a.aws.credentials.profile",
+            "default",
         )
         .getOrCreate()
     )

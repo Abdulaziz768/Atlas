@@ -22,6 +22,16 @@ with DAG(
         sql='load_stock_price.sql',
     )   
 
+    dbt_build = BashOperator(
+        task_id="dbt_build",
+        bash_command=(
+            "dbt build "
+            "--project-dir {{ var.value.atlas_project_path }}/atlas_dbt "
+            "--profiles-dir {{ var.value.atlas_project_path }}/atlas_dbt"
+        ),
+        cwd="{{ var.value.atlas_project_path }}",
+    )
+
     ingest_stock_price = BashOperator(
         task_id="ingest_stock_price",
         bash_command='python scripts/ingest_stock_price.py',
@@ -40,5 +50,5 @@ with DAG(
         task_id="end"
     )
 
-    start>>ingest_stock_price>>stock_price_pyspark>>load_to_snowflake>>end
+    start>>ingest_stock_price>>stock_price_pyspark>>load_to_snowflake>>dbt_build>>end
 

@@ -1,0 +1,13 @@
+atlas_dbt:
+  outputs:
+    dev:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      database: ATLAS_DB
+      schema: STAGING
+      warehouse: ATLAS_WH
+      role: ACCOUNTADMIN
+      threads: 4
+  target: dev
